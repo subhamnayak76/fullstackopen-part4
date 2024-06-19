@@ -76,5 +76,5 @@ const totalLikes = (blogs) => {
       return{author : topauthor,likes : maxlike}
     }
    module.exports = {
-    dummy, totalLikes, favoriteBlog,mostblog
+    dummy, totalLikes, favoriteBlog,mostblog,mostlike
     } 
