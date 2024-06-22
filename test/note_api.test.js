@@ -58,6 +58,21 @@ test('if posting a blog is successful', async () => {
     assert.strictEqual(blogs.length, initialblogs.length + 1);
 });
 
+test('if likes property is missing, it will default to 0', async () => {
+    const newblog = {
+        title: 'Test Blog',
+        author: 'Test Author',
+        url: 'http://testurl.com'
+    };
+    const response = await api
+    .post('/api/blogs')
+    .send(newblog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+    assert.strictEqual(response.body.likes, 0);
+})
+
 after(async () => {
     await mongoose.connection.close();
 });
