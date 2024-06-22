@@ -1,4 +1,5 @@
-// helper.js
+// helper.jsc
+const Blog = require('../models/db');
 const initialblogs = [
     {
         title: 'jwt',
