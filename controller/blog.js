@@ -1,7 +1,7 @@
 
 const blogsRouter = require('express').Router()
 const Blog = require('../models/db')
-
+require('express-async-errors')
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({})
     response.json(blogs)
@@ -15,15 +15,17 @@ blogsRouter.post('/', async(request, response, next) => {
         console.log('Blog saved:', savedBlog);
         response.status(201).json(savedBlog);
     } catch (error) {
-        console.error('Error saving blog:', error);
-        next(error);
+        if (error.name === 'ValidationError') {
+            return response.status(400).json({ error: error.message })
+        
+    
+        }
     }
 })
 
 blogsRouter.delete('/:id',async (request, response, next) => {
-    const id = request.params.id
-    const blog = await Blog.findByIdAndDelete(id)
-    response.status(204).res.json(blog)
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
 }
 )
 
