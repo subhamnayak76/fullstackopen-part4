@@ -1,6 +1,7 @@
 
 const blogsRouter = require('express').Router()
 const Blog = require('../models/db')
+const User = require('../models/UserSchema')
 require('express-async-errors')
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({})
@@ -8,19 +9,19 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async(request, response, next) => {
-    const blog = new Blog(request.body);
-    
-    try {
-        const savedBlog = await blog.save();
-        console.log('Blog saved:', savedBlog);
-        response.status(201).json(savedBlog);
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            return response.status(400).json({ error: error.message })
-        
-    
-        }
-    }
+    const body = request.body
+    const user = await User.findById(body.userId)
+     const blog = new Blog({
+         title: body.title,
+         author: body.author,
+            url: body.url,
+            likes: body.likes,
+            user: user.id
+})
+    const savedBlog = await blog.save()
+    user.blogs = user.blogs.concat(savedBlog.id)
+    await user.save()
+    response.json(savedBlog)
 })
 
 blogsRouter.delete('/:id',async (request, response, next) => {
@@ -31,9 +32,9 @@ blogsRouter.delete('/:id',async (request, response, next) => {
 
 blogsRouter.put('/:id',async (request, response, next) => {
     const body = request.body
-
+    
     const blog = {
-        likes: body.likes,
+        blog : body.blogs,
     }
 
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
