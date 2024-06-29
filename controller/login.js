@@ -30,6 +30,7 @@ loginRouter.post('/', async (request, response) => {
     const userForToken = {
         username: user.username,
         id: user.id,
+        
     };
     console.log('User for token:', userForToken);
     console.log('SECRET:', process.env.SECRET);

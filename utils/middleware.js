@@ -9,7 +9,21 @@ const requestLogger = (request, response, next) => {
   next()
 }
 // Adjust the path as needed
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
+  if (token == null) return res.status(401).json({ error: 'No token provided' });
+
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if (err) {
+      console.error('JWT verification error:', err);
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = decoded;
+    next();
+  });
+};
 const userExtractor = async (req, res, next) => {
   const authorization = req.get('authorization')
   
@@ -74,5 +88,6 @@ module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
-  userExtractor
+  userExtractor,
+  authenticateToken
 }
